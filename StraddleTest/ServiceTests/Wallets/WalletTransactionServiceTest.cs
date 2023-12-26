@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using MockQueryable.Moq;
 using Moq;
 using Newtonsoft.Json;
@@ -30,12 +31,23 @@ namespace StraddleTest.ServiceTests.Wallets
 
         private readonly IMapper mapper;
 
+        private IConfiguration configuration;
+
         private WalletTransactionService _service;
 
         public WalletTransactionServiceTest()
         {
-            MapperConfiguration configuration = new(x => x.AddProfile(new WalletProfile()));
-            mapper = new Mapper(configuration);
+            Dictionary<string, string> inMemorySettings = new()
+            {
+                {"StraddleConfig:AllowedRefundDuration", "1"}
+            };
+
+            configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            MapperConfiguration mapperConfiguration = new(x => x.AddProfile(new WalletProfile()));
+            mapper = new Mapper(mapperConfiguration);
         }
 
         [Fact]
@@ -50,7 +62,7 @@ namespace StraddleTest.ServiceTests.Wallets
             };
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.ParameterEmptyOrNull;
 
@@ -85,7 +97,7 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletTransactionServiceConstants.TransactionExists;
 
@@ -127,7 +139,7 @@ namespace StraddleTest.ServiceTests.Wallets
             accountServiceMock.Setup(x => x.GetCustomerByPhoneNumberAsync(It.IsAny<string>())).ReturnsAsync(customerResponse);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.EntityNotFound;
 
@@ -182,7 +194,7 @@ namespace StraddleTest.ServiceTests.Wallets
             accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletAccountServiceConstants.AccountNotFound;
 
@@ -240,7 +252,7 @@ namespace StraddleTest.ServiceTests.Wallets
             accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletTransactionServiceConstants.InsufficientFunds;
 
@@ -304,7 +316,7 @@ namespace StraddleTest.ServiceTests.Wallets
             queueConfigurationMock.Setup(x => x.SendMessageAsync(It.IsAny<string>())).ReturnsAsync(Task.CompletedTask);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.Success;
 
@@ -322,7 +334,7 @@ namespace StraddleTest.ServiceTests.Wallets
             string transactionReference = string.Empty;
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.ParameterEmptyOrNull;
 
@@ -352,7 +364,7 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletTransactionServiceConstants.TransactionNotFound;
 
@@ -383,7 +395,7 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.Success;
 
@@ -401,7 +413,7 @@ namespace StraddleTest.ServiceTests.Wallets
             string transactionReference = string.Empty;
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.ParameterEmptyOrNull;
 
@@ -431,7 +443,7 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletTransactionServiceConstants.TransactionNotFound;
 
@@ -462,7 +474,7 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletTransactionServiceConstants.TransactionCompleted;
 
@@ -506,7 +518,7 @@ namespace StraddleTest.ServiceTests.Wallets
             accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = WalletAccountServiceConstants.AccountNotFound;
 
@@ -557,12 +569,227 @@ namespace StraddleTest.ServiceTests.Wallets
             transactionRepoMock.Setup(x => x.SaveChangesToDbAsync()).ReturnsAsync(1);
 
             _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
-                transactionRepoMock.Object, accountRepoMock.Object);
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
 
             string expected = ServiceMessages.Success;
 
             //Act
             ServiceResponse<string> actual = await _service.CancelWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_ParameterEmptyOrNull_If_Parameter_Is_Null()
+        {
+            //Arrange
+            string transactionReference = string.Empty;
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = ServiceMessages.ParameterEmptyOrNull;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_TransactionNotFound_If_TransactionReference_Is_NotFound()
+        {
+            //Arrange
+            string transactionReference = Guid.NewGuid().ToString();
+
+            List<WalletTransaction> transactions = new()
+            {
+                new WalletTransaction()
+                {
+                    TransactionReference = Guid.NewGuid().ToString()
+                }
+            };
+
+            IQueryable<WalletTransaction> transactionQuery = transactions.AsQueryable().BuildMock();
+
+            transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = WalletTransactionServiceConstants.TransactionNotFound;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_TransactionNotProcessed_If_TransactionStatus_Is_NotProcessed()
+        {
+            //Arrange
+            string transactionReference = Guid.NewGuid().ToString();
+
+            List<WalletTransaction> transactions = new()
+            {
+                new WalletTransaction()
+                {
+                    TransactionReference = transactionReference,
+                    TransactionStatus = (int)TransactionStatus.Pending
+                }
+            };
+
+            IQueryable<WalletTransaction> transactionQuery = transactions.AsQueryable().BuildMock();
+
+            transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = WalletTransactionServiceConstants.TransactionNotProcessed;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_AccountNotFound_If_TransactionStatus_Is_Processed_And_SourceAccountId_Is_NotFound()
+        {
+            //Arrange
+            string transactionReference = Guid.NewGuid().ToString();
+
+            List<WalletTransaction> transactions = new()
+            {
+                new WalletTransaction()
+                {
+                    TransactionReference = transactionReference,
+                    TransactionStatus = (int)TransactionStatus.Processed,
+                    SourceAccountId = Guid.NewGuid()
+                }
+            };
+
+            IQueryable<WalletTransaction> transactionQuery = transactions.AsQueryable().BuildMock();
+
+            transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
+
+            List<WalletAccount> accounts = new()
+            {
+                new WalletAccount()
+                {
+                    AccountId = Guid.NewGuid()
+                }
+            };
+
+            IQueryable<WalletAccount> accountQuery = accounts.AsQueryable().BuildMock();
+
+            accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = WalletAccountServiceConstants.AccountNotFound;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_RefundDurationElapsed_If_Allowed_Refund_Duration_Has_Elapsed_And_SourceAccountId_Is_Found()
+        {
+            //Arrange
+            string transactionReference = Guid.NewGuid().ToString();
+            Guid sourceAccountId = Guid.NewGuid();
+
+            List<WalletTransaction> transactions = new()
+            {
+                new WalletTransaction()
+                {
+                    TransactionReference = transactionReference,
+                    TransactionStatus = (int)TransactionStatus.Processed,
+                    SourceAccountId = sourceAccountId,
+                    DateCreated = DateTime.UtcNow.AddDays(-1)
+                }
+            };
+
+            IQueryable<WalletTransaction> transactionQuery = transactions.AsQueryable().BuildMock();
+
+            transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
+
+            List<WalletAccount> accounts = new()
+            {
+                new WalletAccount()
+                {
+                    AccountId = sourceAccountId
+                }
+            };
+
+            IQueryable<WalletAccount> accountQuery = accounts.AsQueryable().BuildMock();
+
+            accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = WalletTransactionServiceConstants.RefundDurationElapsed;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
+
+            //Assert
+            Assert.Equal(expected, actual.StatusMessage);
+        }
+
+        [Fact]
+        public async Task RefundWalletTransactionAsync_Should_Return_Success_If_Allowed_Refund_Duration_Has_Not_Elapsed_And_SourceAccountId_Is_Found()
+        {
+            //Arrange
+            string transactionReference = Guid.NewGuid().ToString();
+            Guid sourceAccountId = Guid.NewGuid();
+
+            List<WalletTransaction> transactions = new()
+            {
+                new WalletTransaction()
+                {
+                    TransactionReference = transactionReference,
+                    TransactionStatus = (int)TransactionStatus.Processed,
+                    SourceAccountId = sourceAccountId,
+                    DateCreated = DateTime.UtcNow
+                }
+            };
+
+            IQueryable<WalletTransaction> transactionQuery = transactions.AsQueryable().BuildMock();
+
+            transactionRepoMock.Setup(x => x.Query()).Returns(transactionQuery);
+
+            List<WalletAccount> accounts = new()
+            {
+                new WalletAccount()
+                {
+                    AccountId = sourceAccountId
+                }
+            };
+
+            IQueryable<WalletAccount> accountQuery = accounts.AsQueryable().BuildMock();
+
+            accountRepoMock.Setup(x => x.Query()).Returns(accountQuery);
+
+            _service = new WalletTransactionService(mapper, queueConfigurationMock.Object, accountServiceMock.Object,
+                transactionRepoMock.Object, accountRepoMock.Object, configuration);
+
+            string expected = ServiceMessages.Success;
+
+            //Act
+            ServiceResponse<string> actual = await _service.RefundWalletTransactionAsync(transactionReference);
 
             //Assert
             Assert.Equal(expected, actual.StatusMessage);

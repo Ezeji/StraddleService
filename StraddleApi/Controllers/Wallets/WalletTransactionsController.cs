@@ -56,5 +56,17 @@ namespace StraddleApi.Controllers.Wallets
 
             return response.FormatResponse();
         }
+
+        [HttpPut("{transactionReference}/refund")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        public async Task<IActionResult> RefundWalletTransaction([FromRoute] string transactionReference)
+        {
+            ServiceResponse<string> response = await _walletTransactionService.RefundWalletTransactionAsync(transactionReference);
+
+            return response.FormatResponse();
+        }
     }
 }

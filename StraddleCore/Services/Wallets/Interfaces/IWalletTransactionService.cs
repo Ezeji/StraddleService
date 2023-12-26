@@ -30,5 +30,12 @@ namespace StraddleCore.Services.Wallets.Interfaces
         /// <param name="transactionReference"></param>
         /// <returns></returns>
         Task<ServiceResponse<string>> CancelWalletTransactionAsync(string transactionReference);
+
+        /// <summary>
+        /// Refund wallet transaction.
+        /// </summary>
+        /// <param name="transactionReference"></param>
+        /// <returns></returns>
+        Task<ServiceResponse<string>> RefundWalletTransactionAsync(string transactionReference);
     }
 }

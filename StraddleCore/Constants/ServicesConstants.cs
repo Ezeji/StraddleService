@@ -60,5 +60,7 @@ namespace StraddleCore.Constants
         public const string InsufficientFunds = "Customer cannot carry out this transaction due to insufficient funds";
         public const string TransactionNotFound = "The transaction was not found";
         public const string TransactionCompleted = "The transaction is already processed or refunded";
+        public const string TransactionNotProcessed = "The transaction has not been processed";
+        public const string RefundDurationElapsed = "The refund duration for the transaction has elapsed";
     }
 }

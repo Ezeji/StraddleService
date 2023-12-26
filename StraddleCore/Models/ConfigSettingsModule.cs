@@ -13,6 +13,7 @@ namespace StraddleCore.Models
         public static void AddConfigSettings(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JwtConfig>(configuration.GetSection(JwtConfig.ConfigName));
+            services.Configure<StraddleConfig>(configuration.GetSection(StraddleConfig.ConfigName));
         }
     }
 }

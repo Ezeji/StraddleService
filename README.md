@@ -1,6 +1,6 @@
 # Project description
 This project contains implementation for straddle service. 
-Implementations such as creating a new payment transaction, retrieving payment transaction details and cancelling a payment transaction.
+Implementations such as creating a new payment transaction, retrieving payment transaction details, cancelling a payment transaction and refunding a transaction.
  
 # Project tools
 - ASP.NET Core Web API(For the core API)
